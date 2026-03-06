@@ -96,6 +96,36 @@ foreach ($catDir in $categorias) {
             }
             catch {}
         }
+        # 1.2 Extracción desde Excel para Dataloggers (Mondis)
+        elseif ($file.Extension -match "\.xlsx$|\.xls$" -and $equipoBase -match "Mondis|Datalogger") {
+            try {
+                $excel = New-Object -ComObject Excel.Application -ErrorAction SilentlyContinue
+                if ($excel) {
+                    $excel.Visible = $false
+                    $workbook = $excel.Workbooks.Open($file.FullName)
+                    $sheet = $workbook.Sheets.Item(1)
+                    
+                    # Buscar tabla de sensores (usualmente desde fila 42)
+                    for ($row = 42; $row -le 100; $row++) {
+                        $sensorSerial = $sheet.Cells.Item($row, 2).Text # Columna B: Sensor
+                        if ($sensorSerial -match "^\d{5,}") {
+                            $results += [PSCustomObject]@{
+                                Equipo = "Datalogger - " + $sheet.Cells.Item($row, 1).Text # Columna A: Ubicación
+                                Fecha  = $fechaFinal
+                                Serie  = $sensorSerial
+                            }
+                        }
+                    }
+                    $workbook.Close($false)
+                    $excel.Quit()
+                    [System.Runtime.Interopservices.Marshal]::ReleaseComObject($excel) | Out-Null
+                    continue # Ya agregamos los resultados específicos de este Excel
+                }
+            }
+            catch {
+                if ($excel) { $excel.Quit() }
+            }
+        }
 
         # 2. Fallbacks (Nombre de archivo o carpeta)
         if ($serie -eq "N/A" -or $serie -match "^[0-9a-f]{8}-") {
