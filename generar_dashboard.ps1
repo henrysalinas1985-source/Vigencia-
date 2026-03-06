@@ -105,21 +105,34 @@ foreach ($catDir in $categorias) {
                     $workbook = $excel.Workbooks.Open($file.FullName)
                     $sheet = $workbook.Sheets.Item(1)
                     
-                    # Buscar tabla de sensores (usualmente desde fila 42)
-                    for ($row = 42; $row -le 100; $row++) {
-                        $sensorSerial = $sheet.Cells.Item($row, 2).Text # Columna B: Sensor
+                    # A) Datos Generales del Excel
+                    $modeloExcel = ($sheet.Cells.Item(5, 4).Text -replace "Modelo:\s*", "").Trim() # D5
+                    $marcaExcel = ($sheet.Cells.Item(8, 4).Text -replace "Marca:\s*", "").Trim()  # D8
+                    $fechaExcel = ($sheet.Cells.Item(8, 8).Text).Trim() # H8
+                    
+                    if ($fechaExcel -match "\d{2}/\d{2}/\d{4}") { $fechaFinal = $fechaExcel }
+                    $equipoDesc = [regex]::Replace(($marcaExcel + " " + $modeloExcel).Trim(), "\s+", " ")
+                    if ($equipoDesc -eq "") { $equipoDesc = $equipoBase }
+
+                    # B) Buscar tabla de sensores (usualmente desde fila 42)
+                    $sensoresEncontrados = 0
+                    for ($row = 43; $row -le 150; $row++) {
+                        $sensorSerial = ($sheet.Cells.Item($row, 2).Text).Trim() # Columna B: Sensor
                         if ($sensorSerial -match "^\d{5,}") {
+                            $ubicacion = ($sheet.Cells.Item($row, 1).Text).Trim() # Columna A: Ubicación
                             $results += [PSCustomObject]@{
-                                Equipo = "Datalogger - " + $sheet.Cells.Item($row, 1).Text # Columna A: Ubicación
+                                Equipo = "$equipoDesc ($ubicacion)"
                                 Fecha  = $fechaFinal
                                 Serie  = $sensorSerial
                             }
+                            $sensoresEncontrados++
                         }
                     }
                     $workbook.Close($false)
                     $excel.Quit()
                     [System.Runtime.Interopservices.Marshal]::ReleaseComObject($excel) | Out-Null
-                    continue # Ya agregamos los resultados específicos de este Excel
+                    
+                    continue # Siempre saltar fallback para archivos Excel en estas categorías
                 }
             }
             catch {
