@@ -53,6 +53,14 @@ foreach ($catDir in $categorias) {
     }
 
     foreach ($file in $files) {
+        # Para Mondis/Datalogger vinculados a Excel, ignorar el PDF si existe el Excel para evitar duplicados genéricos
+        if ($equipoBase -match "Mondis|Datalogger" -and $file.Extension -eq ".pdf") {
+            $excelEquivalent = Join-Path $file.Directory.FullName ($base + ".xlsx")
+            if (Test-Path $excelEquivalent) { continue }
+            $excelEquivalent = Join-Path $file.Directory.FullName ($base + ".xls")
+            if (Test-Path $excelEquivalent) { continue }
+        }
+
         $serie = "N/A"
         $fechaFinal = $fechaCarpeta
         $base = [io.path]::GetFileNameWithoutExtension($file.Name)
@@ -121,7 +129,7 @@ foreach ($catDir in $categorias) {
                         if ($sensorSerial -match "^\d{5,}") {
                             $ubicacion = ($sheet.Cells.Item($row, 1).Text).Trim() # Columna A: Ubicación
                             $results += [PSCustomObject]@{
-                                Equipo = "$equipoDesc ($ubicacion)"
+                                Equipo = "$ubicacion"
                                 Fecha  = $fechaFinal
                                 Serie  = $sensorSerial
                             }
