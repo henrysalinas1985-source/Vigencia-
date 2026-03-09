@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Equipamiento - Agustina</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Listado de Equipos</h1>
+            <button id="add-btn" class="btn-primary">
+                <span>+</span> AGREGAR EQUIPO
+            </button>
+        </header>
+
+        <main class="glass-card">
+            <table>
+                <thead>
+                    <tr>
+                        <th>APARATO</th>
+                        <th>EQUIPO</th>
+                        <th>N° SERIE</th>
+                        <th>UBICACIÓN EN EL CENTRO</th>
+                        <th>CALIBRACIÓN 2025</th>
+                        <th>VENCIMIENTO</th>
+                        <th>ACCIONES</th>
+                    </tr>
+                </thead>
+                <tbody id="equipment-list">
+                    <!-- Rows will be injected by JavaScript -->
+                </tbody>
+            </table>
+        </main>
+    </div>
+
+    <!-- Modal for Adding/Editing -->
+    <div id="modal-overlay">
+        <div class="modal glass-card">
+            <h2 style="margin-bottom: 1.5rem;">Agregar Nuevo Equipo</h2>
+            <form id="equipment-form">
+                <div class="form-group">
+                    <label>APARATO</label>
+                    <input type="text" id="aparato" required>
+                </div>
+                <div class="form-group">
+                    <label>EQUIPO</label>
+                    <input type="text" id="equipo" placeholder="Dejar vacío si no aplica">
+                </div>
+                <div class="form-group">
+                    <label>N° SERIE</label>
+                    <input type="text" id="serie" required>
+                </div>
+                <div class="form-group">
+                    <label>UBICACIÓN EN EL CENTRO</label>
+                    <input type="text" id="ubicacion" required>
+                </div>
+                <div class="form-group">
+                    <label>CALIBRACIÓN 2025</label>
+                    <input type="date" id="calibracion">
+                </div>
+                <div class="form-group">
+                    <label>VENCIMIENTO CALIBRACIÓN</label>
+                    <input type="date" id="vencimiento">
+                </div>
+                <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                    <button type="submit" class="btn-primary" style="flex: 1;">GUARDAR</button>
+                    <button type="button" id="cancel-btn" class="btn-danger" style="flex: 1;">CANCELAR</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="app.js" type="module"></script>
+</body>
+</html>
